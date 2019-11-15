@@ -12,10 +12,10 @@ import pdb
 import os
 import matplotlib.pyplot as plt
 from generator import ImageDataGenerator
-from model import buildModel_U_net
-from keras import backend as K
+from model import buildModel_FCRN_A_v2
+from tensorflow.keras import backend as K
 from keras.callbacks import ModelCheckpoint,Callback,LearningRateScheduler
-from scipy import misc
+from imageio import imread
 import scipy.ndimage as ndimage
 
 class LossHistory(Callback):
@@ -46,10 +46,10 @@ def read_data(base_path):
     imList = os.listdir(base_path)
     for i in range(len(imList)): 
         if 'cell' in imList[i]:
-            img1 = misc.imread(os.path.join(base_path,imList[i]))
+            img1 = imread(os.path.join(base_path,imList[i]))
             data.append(img1)
             
-            img2_ = misc.imread(os.path.join(base_path, imList[i][:3] + 'dots.png'))
+            img2_ = imread(os.path.join(base_path, imList[i][:3] + 'dots.png'))
             img2 = 100.0 * (img2_[:,:,0] > 0)
             img2 = ndimage.gaussian_filter(img2, sigma=(1, 1), order=0)
             anno.append(img2)
@@ -69,12 +69,13 @@ def train_(base_path):
 
     val_data = data_[150:]
     val_anno = anno[150:]
+    breakpoint()
     
     print('-'*30)
     print('Creating and compiling the fully convolutional regression networks.')
     print('-'*30)    
    
-    model = buildModel_U_net(input_dim = (256,256,3))
+    model = buildModel_FCRN_A_v2(input_dim = (256,256,3))
     model_checkpoint = ModelCheckpoint('cell_counting.hdf5', monitor='loss', save_best_only=True)
     model.summary()
     print('...Fitting model...')

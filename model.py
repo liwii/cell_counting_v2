@@ -15,13 +15,12 @@ U-net version is also provided.
 from __future__ import absolute_import
 from __future__ import print_function
 import numpy as np
-from keras import backend as K
+from tensorflow.keras import backend as K
 from keras.models import Sequential, Model
 from keras.layers import (
     Input,
     Activation,
-    Merge,
-    merge,
+    Concatenate,
     Dropout,
     Reshape,
     Permute,
@@ -40,7 +39,7 @@ from keras.layers.normalization import BatchNormalization
 from keras.regularizers import l2
 
 weight_decay = 1e-5
-K.set_image_dim_ordering('tf')
+K.image_data_format()
 
 def _conv_bn_relu(nb_filter, row, col, subsample = (1,1)):
     def f(input):
@@ -124,13 +123,13 @@ def U_net_base(input, nb_filter = 64):
     pool3 = MaxPooling2D(pool_size=(2, 2))(block3)
     # =========================================================================
     block4 = _conv_bn_relu_x2(nb_filter,3,3)(pool3)
-    up4 = merge([UpSampling2D(size=(2, 2))(block4), block3], mode='concat', concat_axis=-1)
+    up4 = Concatenate()([UpSampling2D(size=(2, 2))(block4), block3])
     # =========================================================================
     block5 = _conv_bn_relu_x2(nb_filter,3,3)(up4)
-    up5 = merge([UpSampling2D(size=(2, 2))(block5), block2], mode='concat', concat_axis=-1)
+    up5 = Concatenate()([UpSampling2D(size=(2, 2))(block5), block2])
     # =========================================================================
     block6 = _conv_bn_relu_x2(nb_filter,3,3)(up5)
-    up6 = merge([UpSampling2D(size=(2, 2))(block6), block1], mode='concat', concat_axis=-1)
+    up6 = Concatenate()([UpSampling2D(size=(2, 2))(block6), block1])
     # =========================================================================
     block7 = _conv_bn_relu(nb_filter,3,3)(up6)
     return block7
