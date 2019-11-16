@@ -17,6 +17,8 @@ from tensorflow.keras import backend as K
 from keras.callbacks import ModelCheckpoint,Callback,LearningRateScheduler
 from imageio import imread
 import scipy.ndimage as ndimage
+import matplotlib.pyplot as plt
+import cv2
 
 class LossHistory(Callback):
     def on_train_begin(self, logs={}):
@@ -25,7 +27,9 @@ class LossHistory(Callback):
     def on_batch_end(self, batch, logs={}):
         self.losses.append(logs.get('loss'))
 
-base_path = 'cells/'
+#base_path = 'cells/'
+base_path = 'data/'
+out_path = 'out/'
 data = []
 anno = []
 
@@ -42,41 +46,68 @@ def step_decay(epoch):
     print('Learning rate for epoch {} is {}.'.format(epoch+1, lrate))
     return np.float(lrate)
     
+#def read_data(base_path):
+#    imList = os.listdir(base_path)
+#    for i in range(len(imList)):
+#        if 'cell' in imList[i]:
+#            img1 = imread(os.path.join(base_path,imList[i]))
+#            data.append(img1)
+#
+#            img2_ = imread(os.path.join(base_path, imList[i][:3] + 'dots.png'))
+#            img2 = 100.0 * (img2_[:,:,0] > 0)
+#            img2 = ndimage.gaussian_filter(img2, sigma=(1, 1), order=0)
+#            anno.append(img2)
+#            breakpoint()
+#    return np.asarray(data, dtype = 'float32'), np.asarray(anno, dtype = 'float32')
+
 def read_data(base_path):
     imList = os.listdir(base_path)
-    for i in range(len(imList)): 
-        if 'cell' in imList[i]:
-            img1 = imread(os.path.join(base_path,imList[i]))
-            data.append(img1)
-            
-            img2_ = imread(os.path.join(base_path, imList[i][:3] + 'dots.png'))
-            img2 = 100.0 * (img2_[:,:,0] > 0)
-            img2 = ndimage.gaussian_filter(img2, sigma=(1, 1), order=0)
-            anno.append(img2)
+    for i in range(len(imList)):
+        im = imList[i]
+        print(i)
+        print(im)
+        img1 = imread(os.path.join(base_path,im))
+        img1 = cv2.resize(img1, None, fx=0.125, fy=0.125)
+        img1 = img1[0:504, 0:376]
+        data.append(img1)
+        imname, _ = os.path.splitext(im)
+        img2_ = np.rot90(imread(os.path.join(out_path, "{}_viable.png".format(imname))), -1)
+        img2 = np.zeros((int(img2_.shape[0] / 8), int(img2_.shape[1] / 8)))
+        for i in range(0, img2_.shape[0], 8):
+            for j in range(0, img2_.shape[1], 8):
+                img2[i // 8][j // 8] = img2_[i:i+8, j:j+8].max()
+        img2 = 100.0 * (img2 > 0)
+        img2 = ndimage.gaussian_filter(img2, sigma=(1, 1), order=0)
+        img2 = img2[0:504, 0:376]
+        anno.append(img2)
+    print("finish!!")
     return np.asarray(data, dtype = 'float32'), np.asarray(anno, dtype = 'float32')
     
 def train_(base_path):
     data, anno = read_data(base_path)
+    print("loaded!!")
     anno = np.expand_dims(anno, axis = -1)
+    print("expanded!!")
     
     mean = np.mean(data)
+    print("mean finished!!")
     std = np.std(data)
+    print("std finished!!")
     
     data_ = (data - mean) / std
     
-    train_data = data_[:150]
-    train_anno = anno[:150]
+    train_data = data_[:50]
+    train_anno = anno[:50]
 
-    val_data = data_[150:]
-    val_anno = anno[150:]
-    breakpoint()
+    val_data = data_[50:]
+    val_anno = anno[50:]
     
     print('-'*30)
     print('Creating and compiling the fully convolutional regression networks.')
     print('-'*30)    
    
-    model = buildModel_FCRN_A_v2(input_dim = (256,256,3))
-    model_checkpoint = ModelCheckpoint('cell_counting.hdf5', monitor='loss', save_best_only=True)
+    model = buildModel_FCRN_A_v2(input_dim = (504, 376,3))
+    model_checkpoint = ModelCheckpoint('cell_counting_viable.hdf5', monitor='loss', save_best_only=True)
     model.summary()
     print('...Fitting model...')
     print('-'*30)
@@ -108,7 +139,7 @@ def train_(base_path):
                         callbacks = [model_checkpoint, change_lr],
                        )
     
-    model.load_weights('cell_counting.hdf5')
+    model.load_weights('cell_counting_viable.hdf5')
     A = model.predict(val_data)
     mean_diff = np.average(np.abs(np.sum(np.sum(A,1),1)-np.sum(np.sum(val_anno,1),1))) / (100.0)
     print('After training, the difference is : {} cells per image.'.format(np.abs(mean_diff)))
