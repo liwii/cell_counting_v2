@@ -30,7 +30,7 @@ from keras.layers import (
     )
 from keras.optimizers import SGD, RMSprop
 from keras.layers.convolutional import (
-    Convolution2D)
+    Conv2D)
 from keras.layers.pooling import (
     MaxPooling2D,
     AveragePooling2D
@@ -43,9 +43,9 @@ K.image_data_format()
 
 def _conv_bn_relu(nb_filter, row, col, subsample = (1,1)):
     def f(input):
-        conv_a = Convolution2D(nb_filter, row, col, subsample = subsample,
-                               init = 'orthogonal', 
-                               border_mode='same', bias = False)(input)
+        conv_a = Conv2D(nb_filter, (row, col), strides = subsample,
+                               kernel_initializer = 'orthogonal', 
+                               padding='same', use_bias = False)(input)
         norm_a = BatchNormalization()(conv_a)
         act_a = Activation(activation = 'relu')(norm_a)
         return act_a
@@ -53,16 +53,16 @@ def _conv_bn_relu(nb_filter, row, col, subsample = (1,1)):
     
 def _conv_bn_relu_x2(nb_filter, row, col, subsample = (1,1)):
     def f(input):
-        conv_a = Convolution2D(nb_filter, row, col, subsample = subsample,
-                               init = 'orthogonal', border_mode = 'same',bias = False,
-                               W_regularizer = l2(weight_decay),
-                               b_regularizer = l2(weight_decay))(input)
+        conv_a = Conv2D(nb_filter, (row, col), strides = subsample,
+                               kernel_initializer = 'orthogonal', padding = 'same', use_bias = False,
+                               kernel_regularizer = l2(weight_decay),
+                               bias_regularizer = l2(weight_decay))(input)
         norm_a = BatchNormalization()(conv_a)
         act_a = Activation(activation = 'relu')(norm_a)
-        conv_b = Convolution2D(nb_filter, row, col, subsample = subsample,
-                               init = 'orthogonal', border_mode = 'same',bias = False,
-                               W_regularizer = l2(weight_decay),
-                               b_regularizer = l2(weight_decay))(act_a)
+        conv_b = Conv2D(nb_filter, (row, col), strides = subsample,
+                               kernel_initializer = 'orthogonal', padding = 'same', use_bias = False,
+                               kernel_regularizer = l2(weight_decay),
+                               bias_regularizer = l2(weight_decay))(act_a)
         norm_b = BatchNormalization()(conv_b)
         act_b = Activation(activation = 'relu')(norm_b)
         return act_b
@@ -139,10 +139,10 @@ def buildModel_FCRN_A (input_dim):
     # =========================================================================
     act_ = FCRN_A_base (input_)
     # =========================================================================
-    density_pred =  Convolution2D(1, 1, 1, bias = False, activation='linear',\
-                                  init='orthogonal',name='pred',border_mode='same')(act_)
+    density_pred =  Conv2D(1, (1, 1), use_bias = False, activation='linear',\
+                                  kernel_initializer='orthogonal',name='pred', padding='same')(act_)
     # =========================================================================
-    model = Model (input = input_, output = density_pred)
+    model = Model (inputs = input_, outputs = density_pred)
     opt = SGD(lr = 1e-2, momentum = 0.9, nesterov = True)
     model.compile(optimizer = opt, loss = 'mse')
     return model
@@ -152,10 +152,10 @@ def buildModel_FCRN_A_v2 (input_dim):
     # =========================================================================
     act_ = FCRN_A_base_v2 (input_)
     # =========================================================================
-    density_pred =  Convolution2D(1, 1, 1, bias = False, activation='linear',\
-                                  init='orthogonal',name='pred',border_mode='same')(act_)
+    density_pred =  Conv2D(1, (1, 1), use_bias = False, activation='linear',\
+                                  kernel_initializer='orthogonal',name='pred',padding='same')(act_)
     # =========================================================================
-    model = Model (input = input_, output = density_pred)
+    model = Model (inputs = input_, outputs = density_pred)
     opt = SGD(lr = 1e-2, momentum = 0.9, nesterov = True)
     model.compile(optimizer = opt, loss = 'mse')
     return model
@@ -165,10 +165,10 @@ def buildModel_U_net (input_dim):
     # =========================================================================
     act_ = U_net_base (input_, nb_filter = 64 )
     # =========================================================================
-    density_pred =  Convolution2D(1, 1, 1, bias = False, activation='linear',\
-                                  init='orthogonal',name='pred',border_mode='same')(act_)
+    density_pred =  Conv2D(1, (1, 1), use_bias = False, activation='linear',\
+                                  kernel_initializer='orthogonal',name='pred',padding='same')(act_)
     # =========================================================================
-    model = Model (input = input_, output = density_pred)
+    model = Model (inputs = input_, outputs = density_pred)
     opt = RMSprop(1e-3)
     model.compile(optimizer = opt, loss = 'mse')
     return model
