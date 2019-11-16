@@ -62,7 +62,7 @@ def step_decay(epoch):
 
 def read_data(base_path):
     imList = os.listdir(base_path)
-    for i in range(16):
+    for i in range(len(imList)):
         im = imList[i]
         print(i)
         print(im)
@@ -96,11 +96,11 @@ def train_(base_path):
     
     data_ = (data - mean) / std
     
-    train_data = data_[:16]
-    train_anno = anno[:16]
+    train_data = data_[:50]
+    train_anno = anno[:50]
 
-    val_data = data_[16:]
-    val_anno = anno[16:]
+    val_data = data_[50:]
+    val_anno = anno[50:]
     
     print('-'*30)
     print('Creating and compiling the fully convolutional regression networks.')
