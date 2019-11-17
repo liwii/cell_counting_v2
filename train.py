@@ -12,12 +12,11 @@ import pdb
 import os
 import matplotlib.pyplot as plt
 from generator import ImageDataGenerator
-from model import buildModel_FCRN_A_v2
+from model import buildModel_FCRN_A_v2, buildModel_U_net
 from tensorflow.keras import backend as K
 from keras.callbacks import ModelCheckpoint,Callback,LearningRateScheduler
 from imageio import imread
 import scipy.ndimage as ndimage
-import matplotlib.pyplot as plt
 import cv2
 
 class LossHistory(Callback):
