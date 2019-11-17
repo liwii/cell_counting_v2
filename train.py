@@ -13,7 +13,7 @@ import os
 import sys
 import matplotlib.pyplot as plt
 from generator import ImageDataGenerator
-from model import buildModel_FCRN_A_v2, buildModel_U_net
+from model import buildModel_FCRN_A_v2_2channel, buildModel_U_net_2channel
 from tensorflow.keras import backend as K
 from keras.callbacks import ModelCheckpoint,Callback,LearningRateScheduler
 from imageio import imread
@@ -133,8 +133,8 @@ def learn(filename, train_data, train_anno, val_data, val_anno, model):
 def train_(base_path):
     data, anno_viable, anno_dead = read_data(base_path)
     print("loaded!!")
-    anno_viable = np.expand_dims(anno_viable, axis = -1)
-    anno_dead = np.expand_dims(anno_dead, axis = -1)
+    breakpoint()
+    anno = np.stack([anno_viable, anno_dead], axis = 3)
     print("expanded!!")
     
     mean = np.mean(data)
@@ -145,36 +145,24 @@ def train_(base_path):
     data_ = (data - mean) / std
     
     train_data = data_[:50]
-    train_anno_viable = anno_viable[:50]
-    train_anno_dead = anno_dead[:50]
+    train_anno = anno[:50]
 
     val_data = data_[50:]
-    val_anno_viable = anno_viable[50:]
-    val_anno_dead = anno_dead[50:]
+    val_anno = anno[50:]
 
     print('-'*30)
     print('Creating and compiling the fully convolutional regression networks.')
     print('-'*30)    
    
     if sys.argv[1] == 'unet':
-        model = buildModel_U_net(input_dim = (504, 376,3))
-        filename = 'cell_counting_viable_unet.hdf5'
+        model = buildModel_U_net_2channel(input_dim = (504, 376,3))
+        filename = 'cell_counting_2channel_unet.hdf5'
     elif sys.argv[1] == 'fcrna':
-        model = buildModel_FCRN_A_v2(input_dim = (504, 376,3))
-        filename = 'cell_counting_viable_fcrna.hdf5'
+        model = buildModel_FCRN_A_v2_2channel(input_dim = (504, 376,3))
+        filename = 'cell_counting_2channel.hdf5'
     else:
         raise ValueError('The first command line argument should be "unet" or "fcrna"')
-    learn(filename, train_data, train_anno_viable, val_data, val_anno_viable, model)
-
-    if sys.argv[1] == 'unet':
-        model = buildModel_U_net(input_dim = (504, 376,3))
-        filename = 'cell_counting_dead_unet.hdf5'
-    elif sys.argv[1] == 'fcrna':
-        model = buildModel_FCRN_A_v2(input_dim = (504, 376,3))
-        filename = 'cell_counting_dead_fcrna.hdf5'
-    else:
-        raise ValueError('The first command line argument should be "unet" or "fcrna"')
-    learn(filename, train_data, train_anno_dead, val_data, val_anno_dead, model)
+    learn(filename, train_data, train_anno, val_data, val_anno, model)
     
 if __name__ == '__main__':
     train_(base_path)

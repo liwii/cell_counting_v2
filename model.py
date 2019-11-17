@@ -172,3 +172,29 @@ def buildModel_U_net (input_dim):
     opt = RMSprop(1e-3)
     model.compile(optimizer = opt, loss = 'mse')
     return model
+
+def buildModel_FCRN_A_v2_2channel (input_dim):
+    input_ = Input (shape = (input_dim))
+    # =========================================================================
+    act_ = FCRN_A_base_v2 (input_)
+    # =========================================================================
+    density_pred =  Conv2D(2, (1, 1), use_bias = False, activation='linear',\
+                                  kernel_initializer='orthogonal',name='pred',padding='same')(act_)
+    # =========================================================================
+    model = Model (inputs = input_, outputs = density_pred)
+    opt = SGD(lr = 1e-2, momentum = 0.9, nesterov = True)
+    model.compile(optimizer = opt, loss = 'mse')
+    return model
+
+def buildModel_U_net_2channel (input_dim):
+    input_ = Input (shape = (input_dim))
+    # =========================================================================
+    act_ = U_net_base (input_, nb_filter = 64 )
+    # =========================================================================
+    density_pred =  Conv2D(2, (1, 1), use_bias = False, activation='linear',\
+                                  kernel_initializer='orthogonal',name='pred',padding='same')(act_)
+    # =========================================================================
+    model = Model (inputs = input_, outputs = density_pred)
+    opt = RMSprop(1e-3)
+    model.compile(optimizer = opt, loss = 'mse')
+    return model
