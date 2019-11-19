@@ -133,7 +133,6 @@ def learn(filename, train_data, train_anno, val_data, val_anno, model):
 def train_(base_path):
     data, anno_viable, anno_dead = read_data(base_path)
     print("loaded!!")
-    breakpoint()
     anno = np.stack([anno_viable, anno_dead], axis = 3)
     print("expanded!!")
     
