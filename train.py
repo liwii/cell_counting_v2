@@ -164,6 +164,7 @@ def train_(base_path):
             filename = 'cell_counting_viable_fcrna.hdf5'
         else:
             raise ValueError('The first command line argument should be "unet" or "fcrna"')
+        learn(filename, train_data, train_anno_viable, val_data, val_anno_viable, model)
     elif sys.argv[2] == 'dead':
         if sys.argv[1] == 'unet':
             model = buildModel_U_net(input_dim = (504, 376,3))
@@ -173,9 +174,9 @@ def train_(base_path):
             filename = 'cell_counting_dead_fcrna.hdf5'
         else:
             raise ValueError('The first command line argument should be "unet" or "fcrna"')
+        learn(filename, train_data, train_anno_dead, val_data, val_anno_dead, model)
     else:
         raise ValueError('The second command line argument should be "dead" or "viable"')
-    learn(filename, train_data, train_anno_dead, val_data, val_anno_dead, model)
     
 if __name__ == '__main__':
     train_(base_path)
