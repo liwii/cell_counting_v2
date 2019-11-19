@@ -155,25 +155,26 @@ def train_(base_path):
     print('-'*30)
     print('Creating and compiling the fully convolutional regression networks.')
     print('-'*30)    
-   
-    if sys.argv[1] == 'unet':
-        model = buildModel_U_net(input_dim = (504, 376,3))
-        filename = 'cell_counting_viable_unet.hdf5'
-    elif sys.argv[1] == 'fcrna':
-        model = buildModel_FCRN_A_v2(input_dim = (504, 376,3))
-        filename = 'cell_counting_viable_fcrna.hdf5'
+    if sys.arg[2] == 'viable':
+        if sys.argv[1] == 'unet':
+            model = buildModel_U_net(input_dim = (504, 376,3))
+            filename = 'cell_counting_viable_unet.hdf5'
+        elif sys.argv[1] == 'fcrna':
+            model = buildModel_FCRN_A_v2(input_dim = (504, 376,3))
+            filename = 'cell_counting_viable_fcrna.hdf5'
+        else:
+            raise ValueError('The first command line argument should be "unet" or "fcrna"')
+    elif sys.arg [2] == 'viable':
+        if sys.argv[1] == 'unet':
+            model = buildModel_U_net(input_dim = (504, 376,3))
+            filename = 'cell_counting_dead_unet.hdf5'
+        elif sys.argv[1] == 'fcrna':
+            model = buildModel_FCRN_A_v2(input_dim = (504, 376,3))
+            filename = 'cell_counting_dead_fcrna.hdf5'
+        else:
+            raise ValueError('The first command line argument should be "unet" or "fcrna"')
     else:
-        raise ValueError('The first command line argument should be "unet" or "fcrna"')
-    learn(filename, train_data, train_anno_viable, val_data, val_anno_viable, model)
-
-    if sys.argv[1] == 'unet':
-        model = buildModel_U_net(input_dim = (504, 376,3))
-        filename = 'cell_counting_dead_unet.hdf5'
-    elif sys.argv[1] == 'fcrna':
-        model = buildModel_FCRN_A_v2(input_dim = (504, 376,3))
-        filename = 'cell_counting_dead_fcrna.hdf5'
-    else:
-        raise ValueError('The first command line argument should be "unet" or "fcrna"')
+        raise ValueError('The second command line argument should be "dead" or "viable"')
     learn(filename, train_data, train_anno_dead, val_data, val_anno_dead, model)
     
 if __name__ == '__main__':
