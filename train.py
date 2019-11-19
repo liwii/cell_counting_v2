@@ -164,7 +164,7 @@ def train_(base_path):
             filename = 'cell_counting_viable_fcrna.hdf5'
         else:
             raise ValueError('The first command line argument should be "unet" or "fcrna"')
-    elif sys.argv[2] == 'viable':
+    elif sys.argv[2] == 'dead':
         if sys.argv[1] == 'unet':
             model = buildModel_U_net(input_dim = (504, 376,3))
             filename = 'cell_counting_dead_unet.hdf5'
