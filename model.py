@@ -166,7 +166,7 @@ def buildModel_U_net (input_dim):
     act_ = U_net_base (input_, nb_filter = 64 )
     # =========================================================================
     density_pred =  Conv2D(1, (1, 1), use_bias = False, activation='linear',\
-                                  kernel_initializer='orthogonal',name='pred',padding='same')(act_)
+                                  kernel_initializer='ones',name='pred',padding='same')(act_)
     # =========================================================================
     model = Model (inputs = input_, outputs = density_pred)
     opt = RMSprop(1e-3)
