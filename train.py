@@ -168,7 +168,7 @@ def train_(base_path):
     elif sys.argv[2] == 'dead':
         if sys.argv[1] == 'unet':
             model = buildModel_U_net(input_dim = (504, 376,3))
-            filename = 'cell_counting_dead_unet.hdf5'
+            filename = 'cell_counting_dead_unet_pzone.hdf5'
         elif sys.argv[1] == 'fcrna':
             model = buildModel_FCRN_A_v2(input_dim = (504, 376,3))
             filename = 'cell_counting_dead_fcrna.hdf5'

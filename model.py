@@ -37,6 +37,7 @@ from keras.layers.pooling import (
     )
 from keras.layers.normalization import BatchNormalization
 from keras.regularizers import l2
+from keras.initializers import Constant
 
 weight_decay = 1e-5
 K.image_data_format()
@@ -166,7 +167,7 @@ def buildModel_U_net (input_dim):
     act_ = U_net_base (input_, nb_filter = 64 )
     # =========================================================================
     density_pred =  Conv2D(1, (1, 1), use_bias = False, activation='linear',\
-                                  kernel_initializer='ones',name='pred',padding='same')(act_)
+                                  kernel_initializer=Constant(1e-2),name='pred',padding='same')(act_)
     # =========================================================================
     model = Model (inputs = input_, outputs = density_pred)
     opt = RMSprop(1e-3)
