@@ -61,15 +61,16 @@ def step_decay(epoch):
 #            breakpoint()
 #    return np.asarray(data, dtype = 'float32'), np.asarray(anno, dtype = 'float32')
 
+scale = 4
 def process_annodata(pathname):
     img_ = np.rot90(imread(pathname), -1)
-    img = np.zeros((int(img_.shape[0] / 8), int(img_.shape[1] / 8)))
-    for i in range(0, img_.shape[0], 8):
-        for j in range(0, img_.shape[1], 8):
-            img[i // 8][j // 8] = img_[i:i+8, j:j+8].max()
+    img = np.zeros((img_.shape[0] // scale, img_.shape[1] // scale))
+    for i in range(0, img_.shape[0], scale):
+        for j in range(0, img_.shape[1], scale):
+            img[i // scale][j // scale] = img_[i:i+scale, j:j+scale].max()
     img = 100.0 * (img > 0)
     img = ndimage.gaussian_filter(img, sigma=(1, 1), order=0)
-    return img[0:504, 0:376]
+    return img
 
 
 def read_data(base_path):
@@ -79,8 +80,7 @@ def read_data(base_path):
         print(i)
         print(im)
         img1 = imread(os.path.join(base_path,im))
-        img1 = cv2.resize(img1, None, fx=0.125, fy=0.125)
-        img1 = img1[0:504, 0:376]
+        img1 = cv2.resize(img1, None, fx=1/scale, fy=1/scale)
         data.append(img1)
         imname, _ = os.path.splitext(im)
         img_viable = process_annodata(os.path.join(out_path, "{}_viable.png".format(imname)))
@@ -155,10 +155,10 @@ def train_(base_path):
    
     if sys.argv[1] == 'unet':
         model = buildModel_U_net_2channel(input_dim = (504, 376,3))
-        filename = 'cell_counting_2channel_unet_pzone.hdf5'
+        filename = 'cell_counting_2channel_unet_pzone_scaled.hdf5'
     elif sys.argv[1] == 'fcrna':
         model = buildModel_FCRN_A_v2_2channel(input_dim = (504, 376,3))
-        filename = 'cell_counting_2channel_fcrna_pzone.hdf5'
+        filename = 'cell_counting_2channel_fcrna_pzone_scaled.hdf5'
     else:
         raise ValueError('The first command line argument should be "unet" or "fcrna"')
     learn(filename, train_data, train_anno, val_data, val_anno, model)
