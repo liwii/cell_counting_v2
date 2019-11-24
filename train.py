@@ -134,14 +134,16 @@ def train_(base_path):
     npz_file = 'imgs.npz'
     try:
         npz_data = np.load(npz_file)
-        data = npz_data['arr_0']
-        anno = npz_data['arr_1']
+        data = npz_data['arr_0'][:, :, :752, :]
+        anno = npz_data['arr_1'][:, :, :752, :]
     except FileNotFoundError:
         data, anno_viable, anno_dead = read_data(base_path)
         print("loaded!!")
         anno = np.stack([anno_viable, anno_dead], axis = 3)
         print("expanded!!")
         np.savez_compressed(npz_file, data, anno)
+        data = data[:, :, :752, :]
+        anno = anno[:, :, :752, :]
     
     mean = np.mean(data)
     print("mean finished!!")
