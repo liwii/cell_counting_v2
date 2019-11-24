@@ -37,6 +37,7 @@ from keras.layers.pooling import (
     )
 from keras.layers.normalization import BatchNormalization
 from keras.regularizers import l2
+from keras.initializers import Constant
 
 weight_decay = 1e-5
 K.image_data_format()
@@ -179,7 +180,7 @@ def buildModel_FCRN_A_v2_2channel (input_dim):
     act_ = FCRN_A_base_v2 (input_)
     # =========================================================================
     density_pred =  Conv2D(2, (1, 1), use_bias = False, activation='linear',\
-                                  kernel_initializer='orthogonal',name='pred',padding='same')(act_)
+                                  kernel_initializer=Constant(1e-2),name='pred',padding='same')(act_)
     # =========================================================================
     model = Model (inputs = input_, outputs = density_pred)
     opt = SGD(lr = 1e-2, momentum = 0.9, nesterov = True)
@@ -192,7 +193,7 @@ def buildModel_U_net_2channel (input_dim):
     act_ = U_net_base (input_, nb_filter = 64 )
     # =========================================================================
     density_pred =  Conv2D(2, (1, 1), use_bias = False, activation='linear',\
-                                  kernel_initializer='orthogonal',name='pred',padding='same')(act_)
+                                  kernel_initializer=Constant(1e-2),name='pred',padding='same')(act_)
     # =========================================================================
     model = Model (inputs = input_, outputs = density_pred)
     opt = RMSprop(1e-3)
