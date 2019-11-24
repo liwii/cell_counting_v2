@@ -131,10 +131,15 @@ def learn(filename, train_data, train_anno, val_data, val_anno, model):
     print('After training, the difference is : {} cells per image.'.format(np.abs(mean_diff)))
     
 def train_(base_path):
-    data, anno_viable, anno_dead = read_data(base_path)
-    print("loaded!!")
-    anno = np.stack([anno_viable, anno_dead], axis = 3)
-    print("expanded!!")
+    npz_file = 'imgs.npz'
+    try:
+        data, anno = np.load(npz_file)
+    except FileNotFoundError:
+        data, anno_viable, anno_dead = read_data(base_path)
+        print("loaded!!")
+        anno = np.stack([anno_viable, anno_dead], axis = 3)
+        print("expanded!!")
+        np.savez_compressed(npz_file, data, anno)
     
     mean = np.mean(data)
     print("mean finished!!")
