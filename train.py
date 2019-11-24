@@ -133,7 +133,9 @@ def learn(filename, train_data, train_anno, val_data, val_anno, model):
 def train_(base_path):
     npz_file = 'imgs.npz'
     try:
-        data, anno = np.load(npz_file)
+        npz_data = np.load(npz_file)
+        data = npz_data['arr_0']
+        anno = npz_data['arr_1']
     except FileNotFoundError:
         data, anno_viable, anno_dead = read_data(base_path)
         print("loaded!!")
