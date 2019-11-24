@@ -159,10 +159,10 @@ def train_(base_path):
     print('-'*30)    
    
     if sys.argv[1] == 'unet':
-        model = buildModel_U_net_2channel(input_dim = (504, 376,3))
+        model = buildModel_U_net_2channel(input_dim = (1008, 756, 3))
         filename = 'cell_counting_2channel_unet_pzone_scaled.hdf5'
     elif sys.argv[1] == 'fcrna':
-        model = buildModel_FCRN_A_v2_2channel(input_dim = (504, 376,3))
+        model = buildModel_FCRN_A_v2_2channel(input_dim = (1008, 756, 3))
         filename = 'cell_counting_2channel_fcrna_pzone_scaled.hdf5'
     else:
         raise ValueError('The first command line argument should be "unet" or "fcrna"')
