@@ -131,7 +131,7 @@ def learn(filename, train_data, train_anno, val_data, val_anno, model):
     print('After training, the difference is : {} cells per image.'.format(np.abs(mean_diff)))
     
 def train_(base_path):
-    npz_file = 'imgs.npz'
+    npz_file = 'imgs_sigma2.npz'
     try:
         npz_data = np.load(npz_file)
         data = npz_data['arr_0'][:, :, :752, :]
