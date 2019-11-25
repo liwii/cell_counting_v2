@@ -68,7 +68,7 @@ def process_annodata(pathname):
         for j in range(0, img_.shape[1], 8):
             img[i // 8][j // 8] = img_[i:i+8, j:j+8].max()
     img = 100.0 * (img > 0)
-    img = ndimage.gaussian_filter(img, sigma=(1, 1), order=0)
+    img = ndimage.gaussian_filter(img, sigma=(2, 2), order=0)
     return img[0:504, 0:376]
 
 
