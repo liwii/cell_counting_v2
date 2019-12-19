@@ -73,7 +73,7 @@ def process_annodata(pathname):
 
 
 def read_data(base_path):
-    imList = os.listdir(base_path)
+    imList = open('imList2.txt').read().splitlines()
     for i in range(len(imList)):
         im = imList[i]
         print(i)
