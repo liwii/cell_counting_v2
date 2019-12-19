@@ -143,11 +143,11 @@ def train_(base_path):
     
     data_ = (data - mean) / std
     
-    train_data = data_[:50]
-    train_anno = anno[:50]
+    train_data = data_[:40]
+    train_anno = anno[:40]
 
-    val_data = data_[50:]
-    val_anno = anno[50:]
+    val_data = data_[40:]
+    val_anno = anno[40:]
 
     print('-'*30)
     print('Creating and compiling the fully convolutional regression networks.')
