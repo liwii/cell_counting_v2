@@ -68,7 +68,7 @@ def process_annodata(pathname):
         for j in range(0, img_.shape[1], 8):
             img[i // 8][j // 8] = img_[i:i+8, j:j+8].max()
     img = 100.0 * (img > 0)
-    img = ndimage.gaussian_filter(img, sigma=(2, 2), order=0)
+    img = ndimage.gaussian_filter(img, sigma=(1, 1), order=0)
     return img[0:504, 0:376]
 
 
@@ -155,7 +155,7 @@ def train_(base_path):
    
     if sys.argv[1] == 'unet':
         model = buildModel_U_net_2channel(input_dim = (504, 376,3))
-        filename = 'cell_counting_2channel_unet_pzone_sigma2.hdf5'
+        filename = 'cell_counting_2channel_unet_pzone_newset.hdf5'
     elif sys.argv[1] == 'fcrna':
         model = buildModel_FCRN_A_v2_2channel(input_dim = (504, 376,3))
         filename = 'cell_counting_2channel_fcrna_pzone_sigma2.hdf5'
